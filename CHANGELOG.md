@@ -1,5 +1,9 @@
 # GLSL Plugin Changelog
 
+## [1.0.73]
+### Updated
+- IDE build version.
+
 ## [1.0.72]
 ### Updated
 - IDE build version.

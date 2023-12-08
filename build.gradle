@@ -1,8 +1,10 @@
+import org.jetbrains.changelog.Changelog
+
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version "1.8.0"
-    id 'org.jetbrains.intellij' version "1.13.3"
-    id "org.jetbrains.grammarkit" version "2022.3"
-    id 'org.jetbrains.changelog' version "1.3.1"
+    id 'org.jetbrains.kotlin.jvm' version "1.9.21"
+    id 'org.jetbrains.intellij' version "1.16.1"
+    id "org.jetbrains.grammarkit" version "2022.3.2"
+    id 'org.jetbrains.changelog' version "2.2.0"
     id 'java'
 }
 
@@ -38,7 +40,7 @@ generateParser {
     doFirst {
         delete 'src/main/gen/psi'
     }
-    source = 'grammar/GlslGrammar.bnf'
+    setSourceFile(file('grammar/GlslGrammar.bnf'))
     targetRoot = 'src/main/gen'
     pathToParser = '_GlslParser.java'
     pathToPsiRoot = 'psi'
@@ -46,7 +48,7 @@ generateParser {
 
 generateLexer {
     dependsOn(generateParser)
-    source = 'grammar/GlslLexer.flex'
+    setSourceFile(file('grammar/GlslLexer.flex'))
     targetDir = 'src/main/gen/glsl'
     targetClass = '_GlslLexer.java'
 }
@@ -61,10 +63,11 @@ tasks.register('generateGrammarClean') {
 
 patchPluginXml {
     def descriptionHtml = file('plugin-info/description.html').text
-    changeNotes = changelog.get(pluginVersion).toHTML()
+    changeNotes = provider { //noinspection GroovyAssignabilityCheck
+        changelog.renderItem(changelog.get(pluginVersion as String), Changelog.OutputType.HTML)}
     pluginDescription = descriptionHtml
-    sinceBuild = '222'
-    untilBuild = '232.*'
+    sinceBuild = '231'
+    untilBuild = '233.*'
 }
 
 changelog {
