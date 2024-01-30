@@ -50,7 +50,7 @@ DOUBLECONSTANT=({FRACTIONAL}|{FRACTIONAL2}){FLOATING_SUFFIX_DOUBLE}?
 
 BOOLCONSTANT=false|true
 STRING_LITERAL=(\"([^\"\\]|\\.)*\")
-IDENTIFIER=[a-zA-Z_]+\w*
+IDENTIFIER=[a-zA-Z_]+\w*(##\w*[a-zA-Z_]+\w*)*
 PP_VERSION="#version"
 PP_DEFINE="#define"
 PP_UNDEF="#undef"

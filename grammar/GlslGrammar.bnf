@@ -527,7 +527,7 @@
         INTCONSTANT="regexp:0x[\da-fA-F]+|\d+"
         BOOLCONSTANT="regexp:false|true"
         STRING_LITERAL="regexp:(\"([^\"\\]|\[.])*\")"
-        IDENTIFIER="regexp:[a-zA-Z_]+\w*"
+        IDENTIFIER="regexp:[a-zA-Z_]+\w*(##\w*[a-zA-Z_]+\w*)*"
     ]
 }
 
@@ -1162,6 +1162,7 @@ pp_statement
     |    pp_version_declaration PP_END
     |    pp_extension PP_END
     |    pp_line PP_END
+    |    pp_function_call
     |    macro_literal INTCONSTANT PP_END
 
 private pp_extension
@@ -1203,7 +1204,7 @@ pp_single_declaration
     ::= variable_identifier expr?
 
 pp_define_function
-    ::= variable_identifier LEFT_PAREN pp_define_params RIGHT_PAREN expr
+    ::= variable_identifier LEFT_PAREN pp_define_params RIGHT_PAREN (expr|declaration)
     {   pin=2 }
 
 private pp_define_params
@@ -1221,3 +1222,24 @@ macro_literal
     ::= MACRO_LINE
     |   MACRO_FILE
     |   MACRO_VERSION
+
+pp_function_call
+    ::= pp_function_call_header_with_parameters RIGHT_PAREN
+	|   pp_function_call_header_no_parameters RIGHT_PAREN
+
+private pp_function_call_header_no_parameters
+    ::= pp_function_call_header
+
+private pp_recover_function_call_header_with_parameters ::= !(RIGHT_PAREN)
+
+private pp_function_call_header_with_parameters
+    ::= pp_function_call_header pp_function_arg (COMMA pp_function_arg)*
+    {   recoverWhile=pp_recover_function_call_header_with_parameters   }
+
+private pp_function_arg
+    ::= expr_no_assignment
+    |   type_specifier
+    |   LEFT_BRACE struct_declaration_list RIGHT_BRACE
+
+private pp_function_call_header
+    ::= variable_identifier LEFT_PAREN
